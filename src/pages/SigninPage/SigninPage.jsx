@@ -2,9 +2,11 @@ import { Box, Button, Card, CardContent, Container, TextField, Typography } from
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/config/axiosConfig';
+import { useQueryClient } from 'react-query';
 
 function SigninPage(props) {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const [ signinInput, setSigninInput ] = useState({
         username: "",
@@ -61,9 +63,10 @@ function SigninPage(props) {
             const accessToken = response.data.data;
             localStorage.setItem("AccessToken", accessToken)
             api.interceptors.request.use(config => {
-                config.headers.Authorization = `Bearer ${accessToken}`
+                config.headers.Authorization = `Bearer ${accessToken}`;
+                return config;
             })
-
+            queryClient.refetchQueries(["userQuery"]);
             setSigninError(false);
             navigate("/");
 
