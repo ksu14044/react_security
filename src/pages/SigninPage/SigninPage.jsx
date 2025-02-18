@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, Container, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../../api/config/axiosConfig';
+import { api, setAccessToken } from '../../api/config/axiosConfig';
 import { useQueryClient } from '@tanstack/react-query';
 
 
@@ -62,13 +62,8 @@ function SigninPage(props) {
             const response = await api.post("/api/auth/signin", signinInput);
             
             const accessToken = response.data.data;
-            localStorage.setItem("AccessToken", accessToken)
-            api.interceptors.request.use(config => {
-                config.headers.Authorization = `Bearer ${accessToken}`;
-                return config;
-            })
-            queryClient.refetchQueries(["userQuery"]);
-            setSigninError(false);
+            setAccessToken(accessToken);
+            queryClient.invalidateQueries({queryKey: ["userQuery"]});
             navigate("/");
 
             // window.location.href = "/";

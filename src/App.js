@@ -1,15 +1,19 @@
 
 import { healthCheckApi } from "./api/apis/healthCheckApi";
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import IndexPage from "./pages/IndexPage/IndexPage";
-import { Box, Button, ButtonGroup, Container, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Container, getNativeSelectUtilityClasses, Typography } from "@mui/material";
 import AuthRoute from "./routes/AuthRoute/AuthRoute";
 import { userApi } from "./api/apis/userApi";
 import { jwtDecode } from "jwt-decode";
 import UserRoute from "./routes/UserRoute/UserRoute";
 import { useQuery } from "@tanstack/react-query";
+import { api } from "./api/config/axiosConfig";
+import MainHeader from "./components/MainHeader/MainHeader";
 
 function App() {
+
+	const navigate = useNavigate();
 
 	const healthCheckQuery = useQuery({
 		queryKey: ["healthCheckQuery"],
@@ -28,7 +32,7 @@ function App() {
 		queryFn: async () => {
 			const accessToken = localStorage.getItem("AccessToken");
 			if( !accessToken ){
-				 return;
+				 return null;
 			}
 			const decodedJwt = jwtDecode(accessToken);
 			return await userApi(decodedJwt.userId);
@@ -36,32 +40,16 @@ function App() {
 		},
 	});
 
+	
+
   	return (
 		<Container maxWidth="lg">
 			
 			{
-				!userQuery.isLoading &&
+				(!userQuery.isLoading && !userQuery.isRefetching) &&
 				
 				<>
-				<Box display={'flex'} justifyContent={'space-between'} mt={3}>
-					<Typography variant="h6">로고</Typography>
-					<ButtonGroup variant="outlined" aria-label="Basic button group">
-						{
-							!!userQuery.data
-							?
-							<>
-								<Link to={"/user/profile"}><Button>프로필</Button></Link>
-								<Link to={"/user/logout"}><Button>로그아웃</Button></Link>
-							</>
-							:
-							<>
-								<Link to={"/auth/signin"}><Button>로그인</Button></Link>
-								<Link to={"/auth/signup"}><Button>회원가입</Button></Link>
-							</>
-						}
-							
-					</ButtonGroup>
-				</Box>
+				<MainHeader />
 				<Routes>
 					<Route path="/" element={<IndexPage />} />
 					<Route path="/user/*" element={<UserRoute />} />
