@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { useQueryClient } from 'react-query';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import ProfilePage from '../../pages/ProfilePage/ProfilePage';
+import { useQueryClient } from '@tanstack/react-query';
 
 function UserRoute(props) {
     const navigate = useNavigate();
